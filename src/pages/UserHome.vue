@@ -3,7 +3,7 @@
         <h1>{{ NickName }}</h1>
         <el-row :gutter="20">
             <el-col :span="4">
-                <el-avatar :size="170" :src="Avatar" />
+                <el-avatar :size="170" :src="avatar" />
             </el-col>
             <el-col :span="14">
                 用户名：{{ account }}
@@ -26,9 +26,9 @@
 import service from '../axios'
 import UserPieChart from '../components/Chart/UserPieChart.vue'
 import { SuccessMessage, WaringMessage, ErrorMessage } from '../components/Message.vue'
-import { ref, reactive, onMounted } from 'vue'
+import { ref,  onMounted } from 'vue'
 import store from '../store'
-import { useRouter } from 'vue-router'
+
 
 const userpiechart = ref()
 
@@ -36,6 +36,7 @@ const join_time = ref('')
 const ac_num = ref(0)
 const account = ref('')
 const submit_num = ref(0)
+const avatar = ref('')
 
 function GetInfo() {
     service
@@ -50,6 +51,7 @@ function GetInfo() {
                     const year = date.getFullYear();
                     const month = String(date.getMonth() + 1).padStart(2, '0');
                     const day = String(date.getDate()).padStart(2, '0');
+                    avatar.value = json.data.avatar
                     account.value = json.data.account
                     join_time.value = `${year}-${month}-${day}`;
                 } else {
