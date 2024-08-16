@@ -24,7 +24,7 @@
 
 <script setup>
 import service from '../axios'
-import UserPieChart from '../components/Chart/UserPieChart.vue'
+import UserPieChart from '../components/Chart.vue'
 import { SuccessMessage, WaringMessage, ErrorMessage } from '../components/Message.vue'
 import { ref,  onMounted } from 'vue'
 import store from '../store'
@@ -64,8 +64,7 @@ function GetInfo() {
         );
     service.post(`/api/record/query`, {
         uid: store.state.uid
-    })
-        .then(
+    }).then(
             (response) => {
                 let json = response.data
                 if (json.status == "success") {
