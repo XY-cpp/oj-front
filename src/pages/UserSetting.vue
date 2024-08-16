@@ -2,17 +2,22 @@
     <el-card class="box-card">
         <h1>修改个人信息</h1>
         <el-form :model="form" label-width="120px">
-            <el-avatar :size="100" :src="form.avatar" style="display: block; margin: 0 auto;"/>
-            <br/>
+            <el-avatar :size="100" :src="info.avatar" style="display: block; margin: 0 auto;" />
+            <br />
             <el-form-item label="头像">
-                <el-input v-model="form.avatar" />
+                <el-input v-model="form.avatar" :placeholder="info.avatar" />
                 <!-- <el-text class="mx-1">Tip：通过网上获取图片地址链接更改头像</el-text> -->
             </el-form-item>
             <el-form-item label="用户名">
-                <el-input v-model="form.account" maxlength="20" show-word-limit />
+                <el-input v-model="form.account" maxlength="20" show-word-limit :placeholder="info.account" />
             </el-form-item>
             <el-form-item label="密码">
-                <el-input v-model="form.Major" maxlength="20" show-word-limit />
+                <el-input v-model="form.password" maxlength="20" show-word-limit placeholder="输入新密码"
+                    show-password=true />
+            </el-form-item>
+            <el-form-item label="确认密码">
+                <el-input v-model="form.confirm_password" maxlength="20" show-word-limit placeholder="确认新密码"
+                    show-password=true />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="onSubmit">确认</el-button>
@@ -24,109 +29,87 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
+import { SuccessMessage, WaringMessage, ErrorMessage } from '../components/Message.vue'
 import store from '../store'
 import service from '../axios'
-import { useRouter, useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { useRouter, useRoure } from 'vue-router'
 const router = useRouter()
-const route = useRoute()
-
-const pointmessage = ref('')
-const userid = ref('')
 
 const form = reactive({
+    avatar: null,
+    account: null,
+    password: null,
+    confirm_password: null
+})
+
+const info = ref({
     avatar: '',
     account: '',
-    password: ''
+    password: '',
 })
 
 const onSubmit = () => {
-    service
-        .post(`/api/user/update`, {
-            uid: store.state.uid,
-            avatar: form.avatar,
-            account: form.account,
-            password: form.password,
-        })
-        .then(
-            (response) => {
-                if (response.data.Result == "Success") {
-                    // 如果是本人修改则修改头像
-                    if (store.state.UserId == userid.value)
-                        store.state.Avatar = form.Avatar
-
-                    pointmessage.value = "修改成功";
-                    SuccessMessage()
-                    router.go(-1)
-                } else {
-                    pointmessage.value = response.data.Reason
-                    ErrorMessage()
-                }
-            },
-            (error) => {
-                console.log("请求失败了！！！");
-                pointmessage.value = "网络似乎出现了问题！";
-                ErrorMessage()
+    // 检查账户长度
+    if (form.account != null && form.account.length < 2) {
+        WaringMessage("账号长度太短")
+        return
+    }
+    // 检查密码长度
+    if (form.password != null && form.password.length < 6) {
+        WaringMessage("密码长度太短")
+        return
+    }
+    if (form.password != form.confirm_password) {
+        WaringMessage("密码和确认密码不一致！")
+        return
+    }
+    service.post(`/api/user/update`, {
+        uid: store.state.uid,
+        avatar: form.avatar,
+        account: form.account,
+        password: form.password,
+    }).then(
+        (response) => {
+            let json = response.data
+            if (json.status == "success") {
+                SuccessMessage("修改成功")
+                router.go(-1)
+            } else {
+                ErrorMessage(json.message)
             }
-        );
-    console.log('submit!')
+        },
+        (_) => {
+            ErrorMessage("网络似乎出现了问题！")
+        }
+    );
 }
 
 const onCancel = () => {
     router.go(-1)
 }
+
 // 获取用户信息
 function GetServerInfo() {
-    service
-        .get(`/api/user/updateinfo`, {
-            params: {
-                UserId: userid.value
-            }
-        })
+    service.post(`/api/user/query`, { uid: store.state.uid })
         .then(
             (response) => {
-                if (response.data.Result == "Success") {
-                    pointmessage.value = "请求信息成功！";
-                    SuccessMessage()
-                    setdatainfo(response.data)
+                let json = response.data;
+                if (json.status == "success") {
+                    info.value.avatar = json.data.avatar
+                    info.value.account = json.data.account
+                    info.value.password = json.data.password
                 } else {
-                    pointmessage.value = response.data.Reason
-                    ErrorMessage()
+                    ErrorMessage(json.message)
                 }
             },
-            (error) => {
-                pointmessage.value = "网络似乎出现了问题！";
-                ErrorMessage()
+            (_) => {
+                ErrorMessage("网络似乎出现了问题！")
             }
         );
 }
-// 设置信息
-function setdatainfo(info: any) {
-    form.Avatar = info.Avatar
-    form.Major = info.Major
-    form.PersonalProfile = info.PersonalProfile
-    form.School = info.School
-}
 onMounted(() => {
-    userid.value = String(route.query.UserId)
     GetServerInfo()
 })
-// 发送错误消息
-const ErrorMessage = () => {
-    ElMessage({
-        showClose: true,
-        message: pointmessage.value,
-        type: 'error',
-    })
-}
-// 发送成功消息
-const SuccessMessage = () => {
-    ElMessage({
-        showClose: true,
-        message: pointmessage.value,
-        type: 'success',
-    })
-}
 </script>
 
 <style scoped>
