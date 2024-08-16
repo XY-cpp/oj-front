@@ -1,17 +1,21 @@
 <template>
-    <h1>题目</h1>
-    <el-button type="primary" @click="AddProblem">添加题目</el-button>
-    <el-table :data="problemsetdata.array" style="width: 100%" border>
-        <el-table-column prop="ProblemId" label="ID" width="180" />
-        <el-table-column prop="Title" label="Title" width="180" />
-        <el-table-column prop="SubmitNum" label="提交次数" width="180"/>
-        <el-table-column prop="ACNum" label="通过次数" />
+    <h1 class="title">题目列表</h1>
+    <el-button class="add-problem-btn" type="primary" @click="AddProblem">添加题目</el-button>
+    
+    <el-table :data="problemsetdata.array" style="width: 100%" border class="custom-table">
+        <el-table-column prop="pid" label="ID" width="60" />
+        <el-table-column prop="title" label="Title" width="180" />
+        <el-table-column prop="description" label="内容" />
+        <el-table-column prop="time_limit" label="时间限制 (秒)"  width="150"/>
+        <el-table-column prop="memory_limit" label="内存限制 (KB)"  width="150"/>
         <el-table-column label="操作">
             <template #default="scope">
+                <div class="action-buttons">
                 <el-button size="small" @click="handleCheck(scope.row)">查看</el-button>
                 <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
                 <el-button size="small" type="danger"
                 @click="handleDelete(scope.row)">删除</el-button>
+                </div>
             </template>
         </el-table-column>
     </el-table>
@@ -54,14 +58,14 @@ function AddProblem()
 {
     router.push({
         name: "ProblemEditor",
-        query: { ProblemId: "0" ,edittype:"Insert"}
+        query: { pid: "0" ,edittype:"Insert"}
     });
 }
 // 查看题目
 function handleCheck(row){
     router.push({
         name: "Problem",
-        query: { ProblemId: row.ProblemId }
+        query: { pid: row.pid }
     });
 }
 // 编辑题目
@@ -69,23 +73,25 @@ function handleEdit(row){
     console.log('点击编辑',row)
     router.push({
         name: "ProblemEditor",
-        query: { ProblemId: row.ProblemId ,edittype:"Update"}
+        query: { pid: row.pid ,edittype:"Update"}
     });
 }
 // 删除题目
 function handleDelete(row){
     console.log('点击删除',row)
-    service.delete(`/api/problem`,{
-        params:{
-            ProblemId:row.ProblemId
-        }
+    service.post('/api/problem/delete',{
+        pid:row.pid
     }).then(
         response => {
-            console.log('请求成功了',response.data)
-            if(response.data.Result=="Success"){
+            let json = response.data
+            if(json.status == "success"){
+                console.log('请求成功了', json)
                 pointmessage.value = "删除成功"
                 SuccessMessage()
-                router.go(0)
+                GetProblemSetInfo() // 重新加载问题列表
+            }else{
+                console.log('请求失败了', response.data)
+                WaringMessage(json.message)
             }
         },
         error => {
@@ -108,16 +114,19 @@ const handleCurrentChange = (val) => {
 let problemsetdata = reactive({'array':[]})
 
 function GetProblemSetInfo(){
-    service.get(`/api/problemlist/admin`,{
-        params: {
-            Page : currentPage.value,
-            PageSize : pageSize.value
-        },
+    service.post(`/api/problem/querylist`,{
+        page_no : currentPage.value,
+        page_size : pageSize.value
     }).then(
         response => {
-            console.log('请求成功了',response.data)
-            problemsetdata.array = response.data.ArrayInfo
-            totalsize.value = Number(response.data.TotalNum)
+            let json = response.data
+            if(json.status == "success"){
+                console.log('请求成功了',json)
+                problemsetdata.array = json.data.result
+                totalsize.value = Number(json.data.total)
+            }else{
+                WaringMessage(json.message)
+            }
         },
         error => {
             console.log('请求失败了',error.data)
@@ -161,4 +170,23 @@ const ErrorMessage = () => {
 .demo-pagination-block .demonstration {
   margin-bottom: 16px;
 }
+.title {
+  margin-left: 20px;
+}
+.add-problem-btn {
+  float: right;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+.action-buttons {
+    display: flex;
+    justify-content: space-around; /* 或者使用 space-evenly */
+    align-items: center;
+}
+.custom-table {
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
 </style>

@@ -29,12 +29,8 @@ const SolutionList = () => import('@/pages/SolutionList.vue')
 const Solution = () => import('@/pages/Solution.vue')
 const Discuss = () => import('@/pages/Discuss.vue')
 
-const AdminDiscuss = () => import('@/pages/Admin/AdminDiscuss.vue')
 const AdminProblem = () => import('@/pages/Admin/AdminProblem.vue') 
 const AdminUser = () => import('@/pages/Admin/AdminUser.vue')
-const AdminAnnouncement = () => import('@/pages/Admin/AdminAnnouncement.vue') 
-const AdminSolution = () => import('@/pages/Admin/AdminSolution.vue')
-const AdminComment = () => import('@/pages/Admin/AdminComment.vue') 
 
 const AnnouncementEditor = () => import('@/pages/Editor/AnnouncementEditor.vue')
 const SolutionEditor = () => import('@/pages/Editor/SolutionEditor.vue')
@@ -96,11 +92,6 @@ const routes = [
         meta: { title: 'Admin | XDOJ' },
         children:[
             {
-                path:'admindiscuss',
-                component: AdminDiscuss,
-                meta: { title: 'AdminDiscuss | XDOJ' },
-            },
-            {
                 path:'adminproblem',
                 component: AdminProblem,
                 meta: { title: 'AdminProblem | XDOJ' },
@@ -109,21 +100,6 @@ const routes = [
                 path:'adminuser',
                 component: AdminUser,
                 meta: { title: 'AdminUser | XDOJ' },
-            },
-            {
-                path:'adminannouncement',
-                component: AdminAnnouncement,
-                meta: { title: 'AdminAnnouncement | XDOJ' },
-            },
-            {
-                path:'adminsolution',
-                component: AdminSolution,
-                meta: { title: 'AdminSolution | XDOJ' },
-            },
-            {
-                path:'admincomment',
-                component: AdminComment,
-                meta: { title: 'AdminComment | XDOJ' },
             }
         ]
     },

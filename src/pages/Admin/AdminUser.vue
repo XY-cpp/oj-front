@@ -1,18 +1,18 @@
 <template>
-    <h1>用户</h1>
+    <h1 class="title">用户</h1>
     <el-table :data="usersetdata.array" 
         border
-        style="width: 100%">
-        <el-table-column prop="_id" label="ID" width="180" />
-        <el-table-column prop="NickName" label="昵称" width="180" />
-        <el-table-column prop="PersonalProfile" label="个人简介" width="300"/>
-        <el-table-column prop="School" label="学校" width="100"/>
-        <el-table-column prop="Major" label="专业" width="100"/>
-        <el-table-column prop="JoinTime" label="加入时间" width="200"/>
+        style="width: 100%" class="custom-table">
+        <el-table-column prop="uid" label="ID" width="180" />
+        <el-table-column prop="account" label="账户" width="180" />
+        <el-table-column prop="auth" label="权限" width="180" />
+        <el-table-column prop="join_time" label="加入时间" width="200"/>
         <el-table-column label="操作">
             <template #default="scope">
+                <div class="action-buttons">
                 <el-button size="small" @click="handleCheck(scope.row)">查看</el-button>
                 <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
+                </div>
             </template>
         </el-table-column>
     </el-table>
@@ -53,34 +53,33 @@ const disabled = ref(false)
 function handleCheck(row){
     router.push({
         name: "UserHome",
-        query: { UserId: row._id }
+        query: { uid: row.uid }
     });
 }
 // 编辑用户
 function handleEdit(row){
-    console.log('编辑用户',row._id)
+    console.log('编辑用户',row.uid)
     router.push({
         name: "UserSetting",
-        query: {UserId: row._id }
+        query: { uid: row.uid }
     });
 }
 // 删除用户
 function handleDelete(row){
     console.log('点击删除',row)
-    service.delete(`/api/user`,{
-        params:{
-            UserId:row._id
-        }
+    service.post(`/api/user/delete`,{
+        uid: row.uid
     }).then(
         response => {
-            console.log('请求成功了',response.data)
-            if(response.data.Result=="Success"){
+            let json = response.data
+            if(json.status == "success"){
+                console.log('请求成功了', json)
                 pointmessage.value = "删除成功"
                 SuccessMessage()
-                router.go(0)
+                GetUserSetInfo()
             }else{
-                pointmessage.value = response.data.Reason
-                ErrorMessage()
+                console.log('请求失败了', response.data)
+                WaringMessage(json.message)
             }
         },
         error => {
@@ -103,22 +102,20 @@ const handleCurrentChange = (val) => {
 let usersetdata = reactive({'array':[]})
 
 function GetUserSetInfo(m_page, m_pagesize){
-    service.get(`/api/userlist/admin`,{
-        params: {
-            Page : m_page,
-            PageSize : m_pagesize
-        },
-    }).then(
+    service.post(`/api/user/querylist`,{
+        page_no: m_page,
+        page_size: m_pagesize
+    })
+    .then(
         response => {
-            if(response.data.Result == "Success"){
-                console.log('请求成功了',response.data)
-                usersetdata.array = response.data.ArrayInfo
-                totalsize.value = Number(response.data.TotalNum)
+            let json = response.data
+            if(json.status == "success"){
+                console.log('请求成功了',json)
+                usersetdata.array = json.data.result
+                totalsize.value = Number(json.data.total)
             }else{
-                pointmessage.value = response.data.Reason
-                ErrorMessage()
+                WaringMessage(json.message)
             }
-            
         },
         error => {
             console.log('请求失败了',error.data)
@@ -162,5 +159,18 @@ const ErrorMessage = () => {
 }
 .demo-pagination-block .demonstration {
   margin-bottom: 16px;
+}
+.title {
+  margin-left: 20px;
+}
+.custom-table {
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+.action-buttons {
+    display: flex;
+    justify-content: space-around; /* 或者使用 space-evenly */
+    align-items: center;
 }
 </style>
