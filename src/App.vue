@@ -52,7 +52,7 @@
 							<el-dropdown-item command="usersetting">
 								<el-icon><Setting /></el-icon>设置
 							</el-dropdown-item>
-							<el-dropdown-item command="admin" v-if="store.state.IsAdmin">
+							<el-dropdown-item command="admin" v-if="store.state.is_admin">
 								<el-icon><Odometer /></el-icon>管理员
 							</el-dropdown-item>	
 							<el-dropdown-item command="logout">
