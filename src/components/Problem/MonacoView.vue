@@ -35,7 +35,7 @@ function SetData(code, language_code)
     } else if(language_code == 20){
         language = "cpp"
     } else if(language_code == 30){
-        language = "python3"
+        language = "python"
     } else if(language_code == 40){
         language = "rust"
     }

@@ -103,7 +103,7 @@ function GetLanguage()
         return 10
     }else if(language.value == "cpp"){
         return 20
-    }else if(language.value == 'python3'){
+    }else if(language.value == 'python'){
         return 30
     }else if(language.value == 'rust'){
         return 40
