@@ -78,6 +78,7 @@ function SubmitInfo(){
             if(json.status == "success"){
                 SuccessMessage("登录成功")
                 dialogFormVisible.value = false
+                localStorage.setItem('token', response.headers.getAuthorization())
                 store.commit('Login',json.data)
                 router.push({name:'HomePage'})
                 return

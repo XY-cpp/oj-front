@@ -1,5 +1,4 @@
 import { createStore } from 'vuex'
-import service from '../axios'
 
 export default createStore({
 	// 存放数据
@@ -9,12 +8,11 @@ export default createStore({
 		account: 'null',
 		join_time: '',
 		is_admin: false,
-		is_login: false
+		is_login: false,
 	},
 	// 存放函数
 	mutations: {
 		Login(state, data) {
-			localStorage.setItem('has_cookie', true)
 			state.uid = data.uid
 			state.avatar = data.avatar
 			state.account = data.account
@@ -30,8 +28,7 @@ export default createStore({
 			state.join_time = ''
 			state.is_login = false
 			state.is_admin = false
-			localStorage.removeItem('has_cookie')
-			document.cookie = "token" + '=; Max-Age=-99999999;'; 
+			localStorage.removeItem('token')
 		},
 	},
 	actions: {

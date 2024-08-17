@@ -57,9 +57,9 @@ import 'undraw-ui/dist/style.css'
 
 // 获取本地用户信息
 import service from './axios'
-let has_cookie = localStorage.getItem('has_cookie')
+let token = localStorage.getItem('token')
 // 如果获取到Token则进行登录
-if (has_cookie) {
+if (token) {
     service
         .get(`/api/user/tokenlogin`)
         .then(
@@ -68,10 +68,9 @@ if (has_cookie) {
                 if (json.status == "success") {
                     // 登录成功
                     store.commit('Login', json.data)
-                    console.log(json.data)
                 } else {
                     // 登录失败
-                    localStorage.removeItem('has_cookie')
+                    localStorage.removeItem('token')
                     return
                 }
             },
