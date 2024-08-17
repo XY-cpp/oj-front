@@ -13,11 +13,6 @@
                 </div>
                 <br>
                 <el-button type="primary" @click="SubmitCode()" :disabled="submitbutton" :loading="submitloading">提交</el-button>
-                <div id="resultdiv">
-                    <h4>代码运行状态： {{ ResultMsg() }}</h4>
-                    <h4>错误提示： {{ reason }}</h4>
-                    <h3>Tip：可以通过查看测评记录查看每个测试点详细信息</h3>
-                </div>
             </el-col>
             <el-col :span="4">
                 <div class="demo-collapse">
@@ -39,8 +34,6 @@
                         </el-collapse-item>
                     </el-collapse>
                 </div>
-                <br>
-                <el-button type="primary" @click="ClickStatusRecord">提交记录</el-button>
             </el-col>
         </el-row>
     </el-card>
@@ -133,18 +126,12 @@ function SubmitCode() {
             submitloading.value = false
         }
     );
-}
-function ResultMsg()
-{
-    if(result.value == -1)return ""
-    else if(result.value == 0)return "Pending"
-    else if(result.value == 1)return "Compile Error"
-    else if(result.value == 2)return "Accepted"
-    else if(result.value == 3)return "Wrong Answer"
-    else if(result.value == 4)return "Runtime Error"
-    else if(result.value == 5)return "Time Limit Exceeded"
-    else if(result.value == 6)return "Memory Limit Exceeded"
-    else if(result.value == 7)return "System Error"
+    router.push({
+        name:"StatusRecord",
+        query:{
+            ProblemId:route.query.ProblemId
+        }
+    })
 }
 function ClickStatusRecord()
 {

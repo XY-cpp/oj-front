@@ -20,7 +20,7 @@
         <el-table-column prop="pid" label="ID" width="60" />
         <el-table-column prop="title" label="Title" width="180" />
         <el-table-column prop="description" label="内容" />
-        <el-table-column prop="time_limit" label="时间限制 (秒)"  width="150"/>
+        <el-table-column prop="time_limit" label="时间限制 (MS)"  width="150"/>
         <el-table-column prop="memory_limit" label="内存限制 (KB)"  width="150"/>
         <el-table-column label="操作">
             <template #default="scope">

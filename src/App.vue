@@ -32,9 +32,6 @@
 							<el-dropdown-item command="userhome">
 								<el-icon><User /></el-icon>个人主页
 							</el-dropdown-item>
-							<el-dropdown-item command="statusrecord">
-								<el-icon><Edit /></el-icon>我的提交
-							</el-dropdown-item>
 							<el-dropdown-item command="usersetting">
 								<el-icon><Setting /></el-icon>设置
 							</el-dropdown-item>
@@ -93,13 +90,6 @@ function handleCommand(command){
 	})
 	}else if(command == "admin"){
 		router.push({name:"Admin"})
-	}else if(command == "statusrecord"){
-		router.push({
-			name:"StatusRecord",
-			query:{
-				uid: store.state.uid
-			}
-		})
 	}else if(command = "logout"){
 		store.commit('Logout')
 		router.push({name:'HomePage'})
