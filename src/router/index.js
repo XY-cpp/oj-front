@@ -18,88 +18,66 @@ const HomePage = () => import('@/pages/HomePage.vue')
 const ProblemList = () => import('@/pages/ProblemList.vue')
 const Problem = () => import('@/pages/Problem.vue')
 const StatusRecord = () => import('@//pages/StatusRecord.vue')
-const DiscussList = () => import('@/pages/DiscussList.vue') 
-const UserRank = () => import('@/pages/UserRank.vue') 
 const UserHome = () => import('@/pages/UserHome.vue') 
 const UserSetting = () => import('@/pages/UserSetting.vue')
 const Admin = () => import('@/pages/Admin.vue')
 const ProblemEditor = () => import('@/pages/Editor/ProblemEditor.vue')
-const Announcement = () => import('@/pages/Announcement.vue')
-const SolutionList = () => import('@/pages/SolutionList.vue') 
-const Solution = () => import('@/pages/Solution.vue')
-const Discuss = () => import('@/pages/Discuss.vue')
 
 const AdminProblem = () => import('@/pages/Admin/AdminProblem.vue') 
 const AdminUser = () => import('@/pages/Admin/AdminUser.vue')
-
-const AnnouncementEditor = () => import('@/pages/Editor/AnnouncementEditor.vue')
-const SolutionEditor = () => import('@/pages/Editor/SolutionEditor.vue')
-const DiscussEditor = () => import('@/pages/Editor/DiscussEditor.vue')  
 
 const routes = [
     {
         path:'/',
         name:'HomePage',
         component:HomePage,
-        meta: { title: 'HomePage | XDOJ' },
+        meta: { title: 'HomePage | XYOJ' },
     },
     {
         path:'/problemlist',
         name:'ProblemList',
         component:ProblemList,
-        meta: { title: 'ProblemList | XDOJ' },
+        meta: { title: 'ProblemList | XYOJ' },
     },
     {
         path:'/problem',
         name:'Problem',
         component:Problem,
-        meta: { title: 'Problem | XDOJ' },
+        meta: { title: 'Problem | XYOJ' },
     },
     {
         path:'/statusrecord',
         name:'StatusRecord',
         component:StatusRecord,
-        meta: { title: 'StatusRecord | XDOJ' },
-    },
-    {
-        path:'/discusslist',
-        name:'DiscussList',
-        component:DiscussList,
-        meta: { title: 'DiscussList | XDOJ' },
-    },
-    {
-        path:'/userrank',
-        name:'UserRank',
-        component:UserRank,
-        meta: { title: 'UserRank | XDOJ' },
+        meta: { title: 'StatusRecord | XYOJ' },
     },
     {
         path:'/userhome',
         name:'UserHome',
         component:UserHome,
-        meta: { title: 'UserHome | XDOJ' },
+        meta: { title: 'UserHome | XYOJ' },
     },
     {
         path:'/usersetting',
         name:'UserSetting',
         component:UserSetting,
-        meta: { title: 'UserSetting | XDOJ' },
+        meta: { title: 'UserSetting | XYOJ' },
     },
     {
         path:'/admin',
         name:'Admin',
         component:Admin,
-        meta: { title: 'Admin | XDOJ' },
+        meta: { title: 'Admin | XYOJ' },
         children:[
             {
                 path:'adminproblem',
                 component: AdminProblem,
-                meta: { title: 'AdminProblem | XDOJ' },
+                meta: { title: 'AdminProblem | XYOJ' },
             },
             {
                 path:'adminuser',
                 component: AdminUser,
-                meta: { title: 'AdminUser | XDOJ' },
+                meta: { title: 'AdminUser | XYOJ' },
             }
         ]
     },
@@ -107,50 +85,8 @@ const routes = [
         path:'/problemeditor',
         name:'ProblemEditor',
         component:ProblemEditor,
-        meta: { title: 'ProblemEditor | XDOJ' },
+        meta: { title: 'ProblemEditor | XYOJ' },
     },
-    {
-        path:'/announcement',
-        name:'Announcement',
-        component:Announcement,
-        meta: { title: 'Announcement | XDOJ' },
-    },
-    {
-        path:'/solution',
-        name:'Solution',
-        component:Solution,
-        meta: { title: 'Solution | XDOJ' },
-    },
-    {
-        path:'/discuss',
-        name:'Discuss',
-        component:Discuss,
-        meta: { title: 'Discuss | XDOJ' },
-    },
-    {
-        path:'/solutionlist',
-        name:'SolutionList',
-        component:SolutionList,
-        meta: { title: 'SolutionList | XDOJ' },
-    },
-    {
-        path:'/announcementeditor',
-        name:'AnnouncementEditor',
-        component:AnnouncementEditor,
-        meta: { title: 'AnnouncementEditor | XDOJ' },
-    },
-    {
-        path:'/solutioneditor',
-        name:'SolutionEditor',
-        component:SolutionEditor,
-        meta: { title: 'SolutionEditor | XDOJ' },
-    },
-    {
-        path:'/discusseditor',
-        name:'DiscussEditor',
-        component:DiscussEditor,
-        meta: { title: 'DiscussEditor | XDOJ' },
-    },    
 ]
 
 //创建并暴露一个路由器
