@@ -1,36 +1,42 @@
 <template>
-    <h1 class="title">用户</h1>
+    <div>
+        <h1 class="title">用户列表</h1>
 
-    <!-- 搜索栏 -->
-    <el-input
-        v-model="searchUid"
-        placeholder="请输入用户ID进行搜索"
-        class="search-input"
-        clearable
-        @clear="handleClear"
-        @keyup.enter.native="searchUser"
-    >
-        <template #append>
-            <el-button @click="searchUser">搜索</el-button>
-        </template>
-    </el-input>
-
-    <el-table :data="usersetdata.array" 
-        border
-        style="width: 100%" class="custom-table">
-        <el-table-column prop="uid" label="ID" width="180" />
-        <el-table-column prop="account" label="账户" width="180" />
-        <el-table-column prop="auth" label="权限" width="180" />
-        <el-table-column prop="join_time" label="加入时间" width="200"/>
-        <el-table-column label="操作">
-            <template #default="scope">
-                <div class="action-buttons">
-                <el-button size="small" @click="handleCheck(scope.row)">查看</el-button>
-                <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-                </div>
+        <!-- 搜索栏 -->
+        <el-input
+            v-model="searchUid"
+            placeholder="请输入用户ID进行搜索"
+            class="search-input"
+            clearable
+            @clear="handleClear"
+            @keyup.enter.native="searchUser"
+        >
+            <template #append>
+                <el-button @click="searchUser">搜索</el-button>
             </template>
-        </el-table-column>
-    </el-table>
+        </el-input>
+
+        <el-table :data="usersetdata.array" 
+            border
+            style="width: 100%" class="custom-table">
+            <el-table-column prop="uid" label="ID" width="180" />
+            <el-table-column prop="account" label="账户" width="180" />
+            <el-table-column prop="auth" label="权限" width="180" />
+            <el-table-column prop="join_time" label="加入时间" width="200"/>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <div class="action-buttons">
+                    <el-button size="small" @click="handleCheck(scope.row)">查看</el-button>
+                    <el-button size="small" type="primary" @click="openSetAuthDialog(scope.row)">修改权限</el-button>
+                    <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+    <div class="main">
+        <SetAuth ref="SetAuthDialog"></SetAuth>
+    </div>
 
     <div class="demo-pagination-block">
         <el-pagination
@@ -49,12 +55,15 @@
 </template>
 
 <script setup>
+import SetAuth from '../../components/Dialog/SetAuth.vue'
+
 import service from '../../axios'
 import {reactive,ref,onMounted} from 'vue'
 import { useRouter} from 'vue-router'
 import { ElMessage } from 'element-plus'
 const router = useRouter()
 const pointmessage = ref('')
+const SetAuthDialog = ref()
 
 let currentPage = ref(1) // 当前页数
 let pageSize = ref(20) // 当前页的数量
@@ -65,6 +74,10 @@ const disabled = ref(false)
 const searchUid = ref()
 
 // --------------------------------------
+function openSetAuthDialog(row){
+	SetAuthDialog.value.open(row.uid)
+}
+
 // 查看用户
 function handleCheck(row){
     router.push({

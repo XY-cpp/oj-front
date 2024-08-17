@@ -7,28 +7,20 @@
 			v-bind:router="true"
 		>
 			<el-menu-item index="/">
-				<el-icon size="30"><HomeFilled /></el-icon>
+				<el-icon size="50"><HomeFilled /></el-icon>
 				<span class="navtext">首页</span> 
 			</el-menu-item>
 			<el-menu-item index="/problemlist">
-				<el-icon size="30"><Grid /></el-icon>
+				<el-icon size="50"><Grid /></el-icon>
 				<span class="navtext">题库</span>
 			</el-menu-item>
 			<el-menu-item index="/statusrecord">
-				<el-icon size="30"><Tools /></el-icon>
+				<el-icon size="50"><Tools /></el-icon>
 				<span class="navtext">测评</span>	
 			</el-menu-item>
-			<el-menu-item index="/discusslist">
-				<el-icon size="30"><Comment /></el-icon>
-				<span class="navtext">讨论</span>
-			</el-menu-item>
-			<el-menu-item index="/userrank">
-				<el-icon size="30"><Histogram /></el-icon>
-				<span class="navtext">排名</span>
-			</el-menu-item>
 			<div v-if="!store.state.is_login" class="navright">
-				<el-button id="button" type="primary" @click="openlogindialog" text>登录</el-button>
-				<el-button id="button" type="primary" @click="openregisterdialog" text>注册</el-button>
+       			<el-button id="button" type="primary" @click="openlogindialog" text>登录</el-button>
+        		<el-button id="button" type="primary" @click="openregisterdialog" text>注册</el-button>
 			</div>
 			<div v-if="store.state.is_login" class="navright">
 				<el-dropdown @command="handleCommand" id="user">
@@ -140,9 +132,8 @@ function handleCommand(command){
 }
 
 .navright{
-	margin-left: auto;
 	margin-right: 15px;
-	align-self:center
+	align-self:center;
 }
 
 #nav {
