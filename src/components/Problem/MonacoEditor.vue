@@ -4,8 +4,7 @@
         <el-row>
             <el-col :offset="2" :span="10">
                 语言：
-                <el-select v-model="language" placeholder="选择语言" @change="handleLanguage" 
-                    ref="languageselect">
+                <el-select v-model="language" placeholder="选择语言" @change="handleLanguage">
                     <el-option
                         v-for="item in languageOptions"
                         :key="item.value"
@@ -35,9 +34,8 @@ import { ref,onMounted,toRaw,onUnmounted } from 'vue'
 import * as monaco from 'monaco-editor'
 import store from '../../store'
 
-const props = defineProps(['ProblemId'])
+const props = defineProps(['pid'])
 const editor = ref(null)
-const languageselect = ref(null)
 
 const language = ref('cpp')
 const editorTheme = ref("vs")
@@ -53,24 +51,12 @@ const languageOptions = [
         label:'C++'
     },
     {
-        value:'go',
-        label:'Go'
-    },
-    {
-        value:'java',
-        label:'Java'
-    },
-    {
-        value:'python2',
-        label:'Python2'
-    },
-    {
-        value:'python3',
+        value:'python',
         label:'Python3'
     },
     {
-        value:'javascript',
-        label:'JavaScript'
+        value:'rust',
+        label:'Rust'
     }
 ]
 // 初始化代码编辑器
@@ -100,7 +86,8 @@ const handleTheme = () => {
 
 const handleLanguage = (item) => {
     // 保存代码
-    SetLocalStorage(GetCode(), languageselect.value.selected.value)
+    console.log(language.value)
+    SetLocalStorage(GetCode(), language.value)
     language.value = item
     SetCodeAndLanguage()
 }
@@ -113,28 +100,20 @@ function GetCode()
 function GetLanguage()
 {
     if(language.value == "c"){
-        return "C"
+        return 10
     }else if(language.value == "cpp"){
-        return "C++"
-    }else if(language.value == "go"){
-        return "Go"
-    }else if(language.value == 'java'){
-        return "Java"
-    }else if(language.value == 'python2'){
-        return "Python2"
+        return 20
     }else if(language.value == 'python3'){
-        return "Python3"
-    }else if(language.value == 'javascript'){
-        return "JavaScript"
+        return 30
+    }else if(language.value == 'rust'){
+        return 40
     }
 }
 
 // 获取浏览器本地存储
 function GetLocalStorage()
 {
-    // 1-1234-cpp
-    var getstr = String(props.ProblemId)+'-'+String(store.state.UserId)+'-'+language.value
-    console.log('getstr',getstr)
+    var getstr = String(props.pid)+'-'+String(store.state.uid)+'-'+language.value
     if(localStorage.getItem(getstr) == null) return ''
     else return localStorage.getItem(getstr)
 }
@@ -142,8 +121,8 @@ function GetLocalStorage()
 // 设置浏览器本地存储
 function SetLocalStorage(code, language)
 {
-    var setstr = String(props.ProblemId)+'-'+String(store.state.UserId)+'-'+language
-    console.log('setstr',setstr)
+    var setstr = String(props.pid)+'-'+String(store.state.uid)+'-'+language
+    localStorage.setItem("last-language",language)
     localStorage.setItem(setstr,code)
 }
 
@@ -159,8 +138,11 @@ function SetCodeAndLanguage()
 
 onMounted(()=>{
     initEditor()
-    if(store.state.UserId != 0)
+    if(store.state.uid != 0)
     {
+        let last_language = localStorage.getItem("last-language")
+        if(languageOptions.some(option => option.value === last_language))
+            language.value = last_language
         SetCodeAndLanguage()
     }
 })

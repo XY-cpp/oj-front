@@ -1,15 +1,15 @@
 <template>
     <el-card class="box-card">
         <center>
-            <h1>{{ data.problemid }}.{{ data.title }}</h1>
+            <h1>{{ data.pid }}.{{ data.title }}</h1>
         </center>
         <el-row>
             <el-col :span="20">
                 <div class="content">
-                    <v-md-preview :text="data.content"></v-md-preview>
+                    <v-md-preview :text="data.description"></v-md-preview>
                 </div>
                 <div :style="{boxShadow: `var(--el-box-shadow)`}">
-                    <MonacoEditor ref="monacoeditor" :ProblemId=$route.query.ProblemId></MonacoEditor>
+                    <MonacoEditor ref="monacoeditor" :pid=$route.query.pid></MonacoEditor>
                 </div>
                 <br>
                 <el-button type="primary" @click="SubmitCode()" :disabled="submitbutton" :loading="submitloading">提交</el-button>
@@ -24,30 +24,23 @@
                     <el-collapse v-model="activeNames" @change="handleChange">
                         <el-collapse-item title="作者" name="1">
                             <div>
-                                {{ data.nickname }}
+                                {{ data.uid }}
                             </div>
                         </el-collapse-item>
                         <el-collapse-item title="时间限制" name="2">
                             <div>
-                                {{ data.timelimit }} MS
+                                {{ data.time_limit }} MS
                             </div>
                         </el-collapse-item>
                         <el-collapse-item title="空间限制" name="3">
                             <div>
-                                {{ data.memorylimit }} MB
-                            </div>
-                        </el-collapse-item>
-                        <el-collapse-item title="标签" name="4">
-                            <div>
-                                <el-tag v-for="(tag,index) in data.tags" :key="index">{{ tag }}</el-tag>
+                                {{ data.memory_limit }} MB
                             </div>
                         </el-collapse-item>
                     </el-collapse>
                 </div>
                 <br>
                 <el-button type="primary" @click="ClickStatusRecord">提交记录</el-button>
-                <el-button type="primary" @click="ClickSolution">题解</el-button>
-                <el-button type="primary" @click="ClickDiscuss">讨论</el-button>
             </el-col>
         </el-row>
     </el-card>
@@ -60,7 +53,6 @@ import { ref,onMounted,reactive } from "vue"
 import store from '../store'
 import { useRoute,useRouter} from 'vue-router'
 
-
 let submitbutton = ref(false)
 let submitloading = ref(false)
 
@@ -69,16 +61,13 @@ const route = useRoute()
 const router = useRouter()
 // 创建题目描述，是否显示，获取题目数据
 const data = reactive({
-    problemid:'',
+    pid:'',
     title:'',
-    content:'',
-    timelimit:0,
-    memorylimit:0,
-    judgenum:0,
-    submitnum:0,
-    acnum:0,
-    nickname:'',
-    tags:[]
+    description:'',
+    time_limit:0,
+    memory_limit:0,
+    judge_num:0,
+    uid:0,
 })
 
 let result = ref(-1);
@@ -86,38 +75,29 @@ let reason = ref("");
 // 请求当前题目详情
 function GetProblem() {
     service
-    .get(`/api/problem`, {
-        params: {
-            ProblemId: data.problemid,
-        },
+    .post('/api/problem/query', {
+        pid: Number(data.pid),
     })
     .then(
         (response) => {
-            if(response.data.Result == "Success"){
-                console.log("请求成功了！！！",response.data);
-                SetDataInfo(response.data)
+            let json = response.data
+            console.log(json)
+            if(json.status == "success"){
+                data.title = json.data.title
+                data.description = json.data.description
+                data.time_limit = json.data.time_limit
+                data.memory_limit = json.data.memory_limit
+                data.judge_num = json.data.judge_num
+                data.uid = json.data.uid
             }else{
                 console.log('出错啦！')
             }
             
         },
-        (error) => {
-            console.log("请求失败了！！！");
-            console.log(error.data);
+        (_) => {
+            console.log(response.data.data.message);
         }
     );
-}
-function SetDataInfo(Info)
-{
-    data.title = Info.Title
-    data.content = Info.Description
-    data.timelimit = Info.TimeLimit
-    data.memorylimit = Info.MemoryLimit
-    data.judgenum = Info.JudgeNum
-    data.submitnum = Info.SubmitNum
-    data.acnum = Info.ACNum
-    data.nickname = Info.UserNickName
-    data.tags = Info.Tags
 }
 // 提交代码
 function SubmitCode() {
@@ -125,16 +105,11 @@ function SubmitCode() {
     result.value = 0
 
     service
-    .post(`/api/problemcode`, { 
-        ProblemId: data.problemid,
-        UserId:store.state.UserId,
-        UserNickName:store.state.NickName,
-        Code: monacoeditor.value.GetCode(),
-        Language:monacoeditor.value.GetLanguage(),
-        TimeLimit: data.timelimit,
-        MemoryLimit: data.memorylimit,
-        JudgeNum: data.judgenum,
-        ProblemTitle: data.title
+    .post(`/api/record/insert`, { 
+        pid: Number(data.pid),
+        uid: Number(store.state.uid),
+        code: monacoeditor.value.GetCode(),
+        language:monacoeditor.value.GetLanguage(),
     })
     .then(
         (response) => {
@@ -180,29 +155,11 @@ function ClickStatusRecord()
         }
     })
 }
-function ClickSolution()
-{
-    router.push({
-        name:"SolutionList",
-        query:{
-            ParentId:route.query.ProblemId
-        }
-    })
-}
 
-function ClickDiscuss()
-{
-    router.push({
-        name:"DiscussList",
-        query:{
-            ParentId:route.query.ProblemId
-        }
-    })
-}
 onMounted(()=>{
-    data.problemid = route.query.ProblemId
+    data.pid = route.query.pid
     GetProblem();
-    if(store.state.UserId == '0')submitbutton.value = true
+    if(store.state.uid == '0')submitbutton.value = true
 })
 </script>
 

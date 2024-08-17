@@ -27,24 +27,20 @@ function initEditor(){
         autoIndent: true,           //自动布局
     });
 }
-function SetData(Info)
+function SetData(code, language_code)
 {
-    let language = "cpp"
-    if(Info.Language == "C++"){
-        language = "cpp"
-    }else if(Info.Language == "C"){
+    let language = ""
+    if(language_code == 10){
         language = "c"
-    }else if(Info.Language == "Go"){
-        language = "go"
-    }else if(Info.Language == "Java"){
-        language = "java"
-    }else if(Info.language == "Python2"|| Info.language == "Python3"){
-        language = "python"
-    }else if(Info.language == "JavaScript"){
-        language = "javascript"
+    } else if(language_code == 20){
+        language = "cpp"
+    } else if(language_code == 30){
+        language = "python3"
+    } else if(language_code == 40){
+        language = "rust"
     }
-    let code = Info.Code
     const curmodel = toRaw(editor.value).getModel()
+    console.log(code,language)
     const model = monaco.editor.createModel(code,language)
     toRaw(editor.value).setModel(model)
     curmodel.dispose()
