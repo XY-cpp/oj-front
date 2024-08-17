@@ -2,6 +2,20 @@
     <h1 class="title">题目列表</h1>
     <el-button class="add-problem-btn" type="primary" @click="AddProblem">添加题目</el-button>
     
+    <!-- 搜索栏 -->
+    <el-input
+        v-model="searchPid"
+        placeholder="请输入题目ID进行搜索"
+        class="search-input"
+        clearable
+        @clear="handleClear"
+        @keyup.enter.native="searchProblem"
+    >
+        <template #append>
+            <el-button @click="searchProblem">搜索</el-button>
+        </template>
+    </el-input>
+    
     <el-table :data="problemsetdata.array" style="width: 100%" border class="custom-table">
         <el-table-column prop="pid" label="ID" width="60" />
         <el-table-column prop="title" label="Title" width="180" />
@@ -11,10 +25,9 @@
         <el-table-column label="操作">
             <template #default="scope">
                 <div class="action-buttons">
-                <el-button size="small" @click="handleCheck(scope.row)">查看</el-button>
-                <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
-                <el-button size="small" type="danger"
-                @click="handleDelete(scope.row)">删除</el-button>
+                    <el-button size="small" @click="handleCheck(scope.row)">查看</el-button>
+                    <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </div>
             </template>
         </el-table-column>
@@ -38,10 +51,10 @@
 
 <script setup>
 import service from '../../axios'
-import store from '../../store'
-import {reactive,ref,onMounted} from 'vue'
+import {reactive, ref, onMounted } from 'vue'
 import { useRouter} from 'vue-router'
 import { ElMessage } from 'element-plus'
+
 const router = useRouter()
 const pointmessage = ref('')
 
@@ -51,6 +64,7 @@ let totalsize = ref(20)
 const small = ref(false)
 const background = ref(false)
 const disabled = ref(false)
+const searchPid = ref()
 
 // --------------------------------------
 // 添加题目
@@ -99,7 +113,40 @@ function handleDelete(row){
         }
     )
 }
-// -------------------------------------------------------
+
+// 处理搜索
+function searchProblem(){
+    if (searchPid.value !== '') {
+        currentPage.value = 1; // 搜索时回到第一页
+        service
+        .post(`/api/problem/query`,{
+            pid: Number(searchPid.value)
+        }).then(
+            response => {
+                let json = response.data
+                if(json.status == "success"){
+                    console.log('请求成功了',json)
+                    let problemArray = [json.data]
+                    problemsetdata.array = problemArray
+                    totalsize.value = 1
+                }else{
+                    WaringMessage(json.message)
+                }
+            },
+            error => {
+                console.log('请求失败了',error.data)
+            }
+        )
+    }
+}
+
+// 清空搜索
+function handleClear(){
+    searchPid.value = '';
+    GetProblemSetInfo(); // 搜索条件清空后重新加载全部数据
+}
+
+// 处理分页
 const handleSizeChange = (val) => {
     console.log(`${val} items per page`)
     pageSize.value = val;
@@ -110,14 +157,16 @@ const handleCurrentChange = (val) => {
     currentPage.value = val;
     GetProblemSetInfo()
 }
+
 // 题目信息列表
 let problemsetdata = reactive({'array':[]})
 
 function GetProblemSetInfo(){
     service.post(`/api/problem/querylist`,{
         page_no : currentPage.value,
-        page_size : pageSize.value
-    }).then(
+        page_size : pageSize.value,
+    })
+    .then(
         response => {
             let json = response.data
             if(json.status == "success"){
@@ -146,10 +195,10 @@ const SuccessMessage = () => {
     })
 }
 // 发送警告消息
-const WaringMessage = () => {
+const WaringMessage = (message) => {
     ElMessage({
         showClose: true,
-        message: pointmessage.value,
+        message: message,
         type: 'warning',
     })
 }
@@ -188,5 +237,9 @@ const ErrorMessage = () => {
     margin-left: 10px;
     margin-bottom: 10px;
 }
-
+.search-input {
+    width: 400px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
 </style>

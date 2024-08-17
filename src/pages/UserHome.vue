@@ -28,10 +28,13 @@ import UserPieChart from '../components/Chart.vue'
 import { SuccessMessage, WaringMessage, ErrorMessage } from '../components/Message.vue'
 import { ref,  onMounted } from 'vue'
 import store from '../store'
+import { useRouter,useRoute } from 'vue-router'
 
-
+const router = useRouter()
+const route = useRoute();
 const userpiechart = ref()
 
+const userID = ref()
 const join_time = ref('')
 const ac_num = ref(0)
 const account = ref('')
@@ -39,14 +42,16 @@ const submit_num = ref(0)
 const avatar = ref('')
 
 function GetInfo() {
+    console.log('发送用户请求')
     service
         .post(`/api/user/query`, {
-            uid: store.state.uid
+            uid: Number(userID.value)
         })
         .then(
             (response) => {
                 let json = response.data
                 if (json.status == "success") {
+                    console.log('请求成功了', json)
                     const date = new Date(json.data.join_time);
                     const year = date.getFullYear();
                     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -62,12 +67,14 @@ function GetInfo() {
                 ErrorMessage("网络似乎出现了问题！")
             }
         );
+    console.log('发送记录请求')
     service.post(`/api/record/query`, {
-        uid: store.state.uid
+        uid: Number(userID.value)
     }).then(
             (response) => {
                 let json = response.data
                 if (json.status == "success") {
+                    console.log('请求成功了', json)
                     submit_num.value = json.data.length
                     ac_num.value = json.data.filter(item => item.status === 30).length
                     userpiechart.value.SetDataInfo({solved: ac_num.value, unsolved: submit_num.value - ac_num.value})
@@ -82,6 +89,7 @@ function GetInfo() {
 
 }
 onMounted(() => {
+    userID.value = route.query.uid
     // 调用函数
     GetInfo()
 })

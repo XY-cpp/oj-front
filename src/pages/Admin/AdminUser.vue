@@ -1,5 +1,20 @@
 <template>
     <h1 class="title">用户</h1>
+
+    <!-- 搜索栏 -->
+    <el-input
+        v-model="searchUid"
+        placeholder="请输入用户ID进行搜索"
+        class="search-input"
+        clearable
+        @clear="handleClear"
+        @keyup.enter.native="searchUser"
+    >
+        <template #append>
+            <el-button @click="searchUser">搜索</el-button>
+        </template>
+    </el-input>
+
     <el-table :data="usersetdata.array" 
         border
         style="width: 100%" class="custom-table">
@@ -11,7 +26,7 @@
             <template #default="scope">
                 <div class="action-buttons">
                 <el-button size="small" @click="handleCheck(scope.row)">查看</el-button>
-                <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </div>
             </template>
         </el-table-column>
@@ -47,20 +62,13 @@ let totalsize = ref(20)
 const small = ref(false)
 const background = ref(false)
 const disabled = ref(false)
+const searchUid = ref()
 
 // --------------------------------------
 // 查看用户
 function handleCheck(row){
     router.push({
         name: "UserHome",
-        query: { uid: row.uid }
-    });
-}
-// 编辑用户
-function handleEdit(row){
-    console.log('编辑用户',row.uid)
-    router.push({
-        name: "UserSetting",
         query: { uid: row.uid }
     });
 }
@@ -87,24 +95,58 @@ function handleDelete(row){
         }
     )
 }
+
+// 处理搜索
+function searchUser(){
+    if (searchUid.value !== '') {
+        currentPage.value = 1; // 搜索时回到第一页
+        console.log('发送搜索请求')
+        service
+        .post(`/api/user/query`,{
+            uid: Number(searchUid.value)
+        }).then(
+            response => {
+                let json = response.data
+                if(json.status == "success"){
+                    console.log('请求成功了',json)
+                    let UserArray = [json.data]
+                    usersetdata.array = UserArray
+                    totalsize.value = 1
+                }else{
+                    WaringMessage('json.message')
+                }
+            },
+            error => {
+                console.log('请求失败了',error.data)
+            }
+        )
+    }
+}
+
+// 清空搜索
+function handleClear(){
+    searchUid.value = '';
+    GetUserSetInfo(); // 搜索条件清空后重新加载全部数据
+}
+
 // -------------------------------------------------------
 const handleSizeChange = (val) => {
     console.log(`${val} items per page`)
     pageSize.value = val;
-    GetUserSetInfo(currentPage.value,pageSize.value)
+    GetUserSetInfo()
 }
 const handleCurrentChange = (val) => {
     console.log(`current page: ${val}`)
     currentPage.value = val;
-    GetUserSetInfo(currentPage.value,pageSize.value)
+    GetUserSetInfo()
 }
 // 用户信息列表
 let usersetdata = reactive({'array':[]})
 
-function GetUserSetInfo(m_page, m_pagesize){
+function GetUserSetInfo(){
     service.post(`/api/user/querylist`,{
-        page_no: m_page,
-        page_size: m_pagesize
+        page_no: currentPage.value,
+        page_size: pageSize.value
     })
     .then(
         response => {
@@ -121,11 +163,10 @@ function GetUserSetInfo(m_page, m_pagesize){
             console.log('请求失败了',error.data)
         }
     )
-    console.log(m_page,m_pagesize)
 }
 
 onMounted(()=>{
-    GetUserSetInfo(currentPage.value,pageSize.value)
+    GetUserSetInfo()
 })
 // 发送成功消息
 const SuccessMessage = () => {
@@ -172,5 +213,10 @@ const ErrorMessage = () => {
     display: flex;
     justify-content: space-around; /* 或者使用 space-evenly */
     align-items: center;
+}
+.search-input {
+    width: 400px;
+    margin-bottom: 10px;
+    margin-left: 10px;
 }
 </style>
